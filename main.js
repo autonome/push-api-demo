@@ -105,6 +105,8 @@ function subscribe() {
         btn.textContent = 'Disable Push Messages';
         btn.disabled = false;
 
+        console.log(subscription.endpoint);
+
         // TODO: Send the subscription subscription.endpoint
         // to your server and save it to send a push message
         // at a later date
