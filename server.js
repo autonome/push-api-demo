@@ -1,8 +1,8 @@
 var fs = require('fs'),
     sys = require('sys'),
-    http = require('http');
+    https = require('https');
 
-http.createServer(function (request, response) {
+https.createServer(function (request, response) {
 
     request.on('data', function(chunk) {
       console.log('body:' + chunk);
