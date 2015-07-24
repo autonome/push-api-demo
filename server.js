@@ -3,7 +3,8 @@ var fs = require('fs'),
     https = require('https');
 
 var options = {
-  pfx: fs.readFileSync('1ebf9fab-8546-40c9-a34f-7e23d9cd7d99.pfx')
+  pfx: fs.readFileSync('aa34f6b8-f1c5-4e32-afd7-7a5f9f0b659c.pfx'),
+  passphrase: 'password'
 };
 
 https.createServer(options, function (request, response) {
