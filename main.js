@@ -1,12 +1,20 @@
 var isPushEnabled = false;
 var useNotifications = false;
 
-var btn = document.querySelector('button'); 
+var subBtn = document.querySelector('.subscribe');
+var sendBtn;
+
+var nameForm = document.querySelector('#form');
+var nameInput = document.querySelector('#name-input');
+nameForm.onsubmit = function(e) {
+  e.preventDefault()
+};
+nameInput.value = 'Bob';
 
 Notification.requestPermission();
 
 window.addEventListener('load', function() {   
-  btn.addEventListener('click', function() {  
+  subBtn.addEventListener('click', function() {  
     if (isPushEnabled) {  
       unsubscribe();  
     } else {  
@@ -66,7 +74,7 @@ function initialiseState(reg) {
         // Enable any UI which subscribes / unsubscribes from  
         // push messages.  
  
-        btn.disabled = false;
+        subBtn.disabled = false;
 
         if (!subscription) {  
           console.log('Not yet subscribed to Push')
@@ -80,8 +88,10 @@ function initialiseState(reg) {
 
         // Set your UI to show they have subscribed for  
         // push messages  
-        btn.textContent = 'Disable Push Messages';  
+        subBtn.textContent = 'Disable Push Messages';  
         isPushEnabled = true;  
+
+        updateStatus(subscription);
       })  
       .catch(function(err) {  
         console.log('Error during getSubscription()', err);  
@@ -95,22 +105,17 @@ function subscribe() {
   // Disable the button so it can't be changed while
   // we process the permission request
 
-  btn.disabled = true;
+  subBtn.disabled = true;
 
   navigator.serviceWorker.ready.then(function(reg) {
     reg.pushManager.subscribe({userVisibleOnly: true})
       .then(function(subscription) {
         // The subscription was successful
         isPushEnabled = true;
-        btn.textContent = 'Disable Push Messages';
-        btn.disabled = false;
+        subBtn.textContent = 'Disable Push Messages';
+        subBtn.disabled = false;
 
-        console.log(subscription.endpoint);
-
-        // TODO: Send the subscription subscription.endpoint
-        // to your server and save it to send a push message
-        // at a later date
-        //return sendSubscriptionToServer(subscription);
+        updateStatus(subscription);
       })
       .catch(function(e) {
         if (Notification.permission === 'denied') {
@@ -125,15 +130,15 @@ function subscribe() {
           // often be down to an issue or lack of the gcm_sender_id
           // and / or gcm_user_visible_only
           console.log('Unable to subscribe to push.', e);
-          btn.disabled = false;
-          btn.textContent = 'Enable Push Messages';
+          subBtn.disabled = false;
+          subBtn.textContent = 'Enable Push Messages';
         }
       });
   });
 }
 
 function unsubscribe() {
-  btn.disabled = true;
+  subBtn.disabled = true;
 
   navigator.serviceWorker.ready.then(function(reg) {
     // To unsubscribe from push messaging, you need get the
@@ -145,16 +150,19 @@ function unsubscribe() {
           // No subscription object, so set the state
           // to allow the user to subscribe to push
           isPushEnabled = false;
-          btn.disabled = false;
-          btn.textContent = 'Enable Push Messages';
+          subBtn.disabled = false;
+          subBtn.textContent = 'Enable Push Messages';
           return;
         }
+        
+        isPushEnabled = false;
+        updateStatus(subscription);
 
 
         // We have a subcription, so call unsubscribe on it
         subscription.unsubscribe().then(function(successful) {
-          btn.disabled = false;
-          btn.textContent = 'Enable Push Messages';
+          subBtn.disabled = false;
+          subBtn.textContent = 'Enable Push Messages';
           isPushEnabled = false;
         }).catch(function(e) {
           // We failed to unsubscribe, this can lead to
@@ -163,11 +171,43 @@ function unsubscribe() {
           // inform the user that you disabled push
 
           window.Demo.debug.log('Unsubscription error: ', e);
-          btn.disabled = false;
+          subBtn.disabled = false;
         });
       }).catch(function(e) {
         console.log('Error thrown while unsubscribing from ' +
           'push messaging.', e);
       });
   });
+}
+
+function updateStatus(subscription) {
+  if(isPushEnabled) {
+    console.log(subscription.endpoint);
+  
+    sendBtn = document.createElement('button');
+    sendBtn.textContent = 'Send Push Message';
+    document.body.appendChild(sendBtn);
+
+    var request = new XMLHttpRequest();
+
+
+    request.open('POST', 'http://127.0.0.1:7000');
+    request.setRequestHeader('Access-Control-Allow-Origin', '*');
+    request.setRequestHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    request.setRequestHeader('Content-Type', 'application/json');
+    
+    var subscribeObj = {
+                         type: 'subscription',
+                         name:nameInput.value,
+                         endPoint:subscription.endpoint
+                       }
+    console.log(subscribeObj);
+    request.send(subscribeObj);
+
+    sendBtn.addEventListener('click',function() {
+
+    });
+  } else if(!isPushEnabled) {
+    document.body.removeChild(sendBtn);
+  }
 }
