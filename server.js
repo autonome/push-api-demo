@@ -2,7 +2,11 @@ var fs = require('fs'),
     sys = require('sys'),
     https = require('https');
 
-https.createServer(function (request, response) {
+var options = {
+  pfx: fs.readFileSync('1ebf9fab-8546-40c9-a34f-7e23d9cd7d99.pfx')
+};
+
+https.createServer(options, function (request, response) {
 
     request.on('data', function(chunk) {
       console.log('body:' + chunk);
