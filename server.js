@@ -10,8 +10,8 @@ var options = {
 https.createServer(options, function (request, response) {
 
     request.on('data', function(chunk) {
-      console.log('body:' + chunk);
       var jsonObj = JSON.parse(chunk);
+      console.log('body: ' + chunk);
     })
   
     fs.readFile("endpoint.txt", function (err, buffer) {

@@ -194,10 +194,11 @@ function updateStatus(endpoint) {
 
     var request = new XMLHttpRequest();
 
-    request.setRequestHeader('Access-Control-Allow-Origin', '*');
-    request.setRequestHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    request.setRequestHeader('Content-Type', 'application/json');
     request.open('POST', 'https://127.0.0.1:7000', true);
+    
+    request.setRequestHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Origin, access-control-allow-headers');
+    request.setRequestHeader('Access-Control-Allow-Origin', '*');
+    request.setRequestHeader('Content-Type', 'application/json');
     
     var subscribeObj = {
                          type: 'subscription',
