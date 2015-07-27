@@ -190,11 +190,10 @@ function updateStatus(subscription) {
 
     var request = new XMLHttpRequest();
 
-
-    request.open('POST', 'https://127.0.0.1:7000');
     request.setRequestHeader('Access-Control-Allow-Origin', '*');
     request.setRequestHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     request.setRequestHeader('Content-Type', 'application/json');
+    request.open('POST', 'https://127.0.0.1:7000', true);
     
     var subscribeObj = {
                          type: 'subscription',
@@ -204,9 +203,9 @@ function updateStatus(subscription) {
     console.log(subscribeObj);
     request.send(subscribeObj);
 
-    sendBtn.addEventListener('click',function() {
+    // sendBtn.addEventListener('click',function() {
 
-    });
+    // });
   } else if(!isPushEnabled) {
     document.body.removeChild(sendBtn);
   }
