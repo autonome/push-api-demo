@@ -8,11 +8,15 @@ var options = {
 };
 
 https.createServer(options, function (request, response) {
+    var body = "";
 
     request.on('data', function(chunk) {
-      var jsonObj = JSON.parse(chunk);
-      console.log('body: ' + chunk);
+      body += chunk;
     })
+
+    request.on('end', function() {
+      console.log('POSTed: ' + body);
+    });
   
     fs.readFile("endpoint.txt", function (err, buffer) {
 
@@ -40,9 +44,9 @@ https.createServer(options, function (request, response) {
       response.writeHead(200, {
         "Content-Type": "text/plain",
         "Access-Control-Allow-Origin": "*", 
-        "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept"});
+        "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Origin, Access-Control-Allow-Headers"});
 
-      response.end('Hello from server');
+      response.end(body);
     });
 }).listen(7000);
 console.log("Server Running on 7000.");   

@@ -195,15 +195,12 @@ function updateStatus(endpoint) {
     var request = new XMLHttpRequest();
 
     request.open('POST', 'https://127.0.0.1:7000', true);
-    
-    request.setRequestHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Origin, access-control-allow-headers');
-    request.setRequestHeader('Access-Control-Allow-Origin', '*');
-    request.setRequestHeader('Content-Type', 'application/json');
+    request.setRequestHeader('Content-Type', 'text/plain');
     
     var subscribeObj = {
                          type: 'subscription',
                          name:nameInput.value,
-                         endPoint:endpoint
+                         endpoint:endpoint
                        }
     console.log(subscribeObj);
     request.send(subscribeObj);
