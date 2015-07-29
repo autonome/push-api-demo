@@ -28,25 +28,30 @@ https.createServer(options, function (request, response) {
             for(i = 0; i < (array.length-1); i++) {
               var subscriber = array[i].split(',');
               console.log(subscriber[2]);
-              URLParts = url.parse(subscriber[2])
+              URLParts = url.parse(subscriber[2]);
 
               // send request to each push endpoint telling them the new subscriber
               // has subscribed, along with subscribe token so SW knows how to deal with it.
               var options = {
-                host: URLParts.hostname,
-                port: 443,
+                hostname: URLParts.hostname,
                 path: URLParts.pathname,
-                method: 'POST'
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'plain/text',
+                  'Content-Length': subscriber[1].length
+                }
               };
 
               var pushRequest = https.request(options, function(pushResponse) {
                 console.log("statusCode: ", pushResponse.statusCode);
                 console.log("headers: ", pushResponse.headers);
 
-                pushResponse.on('data', function(d) {
-                  pushRequest.write(subscriber[1] + ' has subscribed.');
-                  pushRequest.end();
-                });
+                pushRequest.write(subscriber[1] + ' has subscribed.');
+                pushRequest.end();
+
+                // pushResponse.on('data', function(d) {
+                  
+                // });
               });
               
               pushRequest.on('error', function(e) {
