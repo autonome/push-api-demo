@@ -92,7 +92,7 @@ function initialiseState(reg) {
         isPushEnabled = true;  
         
         var endpoint = subscription.endpoint;
-        updateStatus(endpoint);
+        updateStatus(endpoint,'init');
       })  
       .catch(function(err) {  
         console.log('Error during getSubscription()', err);  
@@ -117,7 +117,7 @@ function subscribe() {
         subBtn.disabled = false;
         
         var endpoint = subscription.endpoint;
-        updateStatus(endpoint);
+        updateStatus(endpoint,'subscribe');
       })
       .catch(function(e) {
         if (Notification.permission === 'denied') {
@@ -160,7 +160,7 @@ function unsubscribe() {
         isPushEnabled = false;
 
         var endpoint = subscription.endpoint;
-        updateStatus(endpoint);
+        updateStatus(endpoint,'unsubscribe');
 
 
         // We have a subcription, so call unsubscribe on it
@@ -184,8 +184,8 @@ function unsubscribe() {
   });
 }
 
-function updateStatus(endpoint) {
-  if(isPushEnabled) {
+function updateStatus(endpoint,statusType) {
+  if(statusType === 'subscribe') {
     console.log(endpoint);
   
     sendBtn = document.createElement('button');
@@ -195,20 +195,28 @@ function updateStatus(endpoint) {
     var request = new XMLHttpRequest();
 
     request.open('POST', 'https://127.0.0.1:7000', true);
-    request.setRequestHeader('Content-Type', 'text/plain');
+    request.setRequestHeader('Content-Type', 'application/json');
     
-    var subscribeObj = {
-                         type: 'subscription',
-                         name:nameInput.value,
-                         endpoint:endpoint
-                       }
+    var subscribeObj = [
+                         statusType,
+                         nameInput.value,
+                         endpoint
+                       ]
     console.log(subscribeObj);
     request.send(subscribeObj);
 
     // sendBtn.addEventListener('click',function() {
 
     // });
-  } else if(!isPushEnabled) {
+  } else if(statusType === 'unsubscribe') {
     document.body.removeChild(sendBtn);
+  } else if(statusType === 'init') {
+    sendBtn = document.createElement('button');
+    sendBtn.textContent = 'Send Push Message';
+    document.body.appendChild(sendBtn);
+
+    // sendBtn.addEventListener('click',function() {
+
+    // });
   }
 }
