@@ -37,22 +37,21 @@ https.createServer(options, function (request, response) {
                 path: URLParts.pathname,
                 method: 'PUT',
                 headers: {
-                  'Content-Type': 'plain/text',
-                  'Content-Length': subscriber[1].length
+                  'Content-Type': 'plain/text'
                 }
               };
 
               var pushRequest = https.request(options, function(pushResponse) {
                 console.log("statusCode: ", pushResponse.statusCode);
-                console.log("headers: ", pushResponse.headers);
+                console.log("headers: ", pushResponse.headers);               
 
-                pushRequest.write(subscriber[1] + ' has subscribed.');
-                pushRequest.end();
-
-                // pushResponse.on('data', function(d) {
-                  
-                // });
+                pushResponse.on('data', function(d) {
+                  console.log('I got a response');
+                });
               });
+
+              pushRequest.write(subscriber[1]);
+              pushRequest.end();
               
               pushRequest.on('error', function(e) {
                 console.error(e);
