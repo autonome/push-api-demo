@@ -96,7 +96,17 @@ function initialiseState(reg) {
       })  
       .catch(function(err) {  
         console.log('Error during getSubscription()', err);  
-      });  
+      }); 
+
+      // set up a message channel to communicate with the SW
+      var channel = new MessageChannel();
+      channel.port1.onmessage = function(e) {
+        alert('Message received from SW: ' + e.data);
+      }
+
+      mySW = reg.active;
+      console.log(mySW); // check it exists.
+      mySW.postMessage('hello', [channel.port2]);
   });  
 }
 
@@ -147,6 +157,9 @@ function unsubscribe() {
     // subcription object, which you can call unsubscribe() on.
     reg.pushManager.getSubscription().then(
       function(subscription) {
+        var endpoint = subscription.endpoint;
+        updateStatus(endpoint,'unsubscribe');
+        
         // Check we have a subscription to unsubscribe
         if (!subscription) {
           // No subscription object, so set the state
@@ -158,10 +171,6 @@ function unsubscribe() {
         }
         
         isPushEnabled = false;
-
-        var endpoint = subscription.endpoint;
-        updateStatus(endpoint,'unsubscribe');
-
 
         // We have a subcription, so call unsubscribe on it
         subscription.unsubscribe().then(function(successful) {
@@ -210,6 +219,20 @@ function updateStatus(endpoint,statusType) {
     // });
   } else if(statusType === 'unsubscribe') {
     document.body.removeChild(sendBtn);
+
+    var request = new XMLHttpRequest();
+
+    request.open('POST', 'https://127.0.0.1:7000', true);
+    request.setRequestHeader('Content-Type', 'application/json');
+    
+    var subscribeObj = [
+                         statusType,
+                         nameInput.value,
+                         endpoint
+                       ]
+    console.log(subscribeObj);
+    request.send(subscribeObj);
+
   } else if(statusType === 'init') {
     sendBtn = document.createElement('button');
     sendBtn.textContent = 'Send Push Message';

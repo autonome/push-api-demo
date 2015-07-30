@@ -35,7 +35,10 @@ https.createServer(options, function (request, response) {
               var options = {
                 hostname: URLParts.hostname,
                 path: URLParts.pathname,
-                method: 'PUT'
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'plain/text'
+                }
               };
 
               var pushRequest = https.request(options, function(pushResponse) {
@@ -57,6 +60,60 @@ https.createServer(options, function (request, response) {
           });
 
         });
+      } else if(bodyArray[0] === 'unsubscribe') {
+          fs.readFile("endpoint.txt", function (err, buffer) {
+            var newString = '';
+            var string = buffer.toString();
+            var array = string.split('\n');
+            for(i = 0; i < (array.length-1); i++) {
+              var subscriber = array[i].split(',');
+              
+              console.log('Unsubscribe: ' + subscriber[1]);
+              URLParts = url.parse(subscriber[2]);
+
+              // send request to each push endpoint telling them the subscriber
+              // has unsubscribed.
+              var options = {
+                hostname: URLParts.hostname,
+                path: URLParts.pathname,
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'plain/text'
+                }
+              };
+
+              var unsubscribeRequest = https.request(options, function(unsubscribeResponse) {
+                console.log("Unsubscribe statusCode: ", unsubscribeResponse.statusCode);
+                console.log("Unsubscribe headers: ", unsubscribeResponse.headers);               
+
+                unsubscribeResponse.on('data', function(d) {
+                  console.log('I got an unsubscribe response');
+                });
+              });
+
+              unsubscribeRequest.write(subscriber[1]);
+              unsubscribeRequest.end();
+              
+              unsubscribeRequest.on('error', function(e) {
+                console.error(e);
+              });
+
+              if(bodyArray[2] === subscriber[2]) {
+                console.log('subscriber found.');
+              } else {
+                newString += array[i] + '\n';
+              }
+            }
+
+
+            fs.writeFile('endpoint.txt', newString, function (err) {
+              if (err) throw err;
+              console.log('Subscriber unsubscribed');
+            });
+              
+          });
+
+        
       }
     });
 
