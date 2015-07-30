@@ -35,10 +35,7 @@ https.createServer(options, function (request, response) {
               var options = {
                 hostname: URLParts.hostname,
                 path: URLParts.pathname,
-                method: 'PUT',
-                headers: {
-                  'Content-Type': 'plain/text'
-                }
+                method: 'PUT'
               };
 
               var pushRequest = https.request(options, function(pushResponse) {
