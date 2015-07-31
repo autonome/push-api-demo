@@ -88,7 +88,7 @@ function initialiseState(reg) {
 
         // Set your UI to show they have subscribed for  
         // push messages  
-        subBtn.textContent = 'Disable Push Messages';  
+        subBtn.textContent = 'Unsubscribe from Push Messaging';  
         isPushEnabled = true;  
         
         var endpoint = subscription.endpoint;
@@ -123,7 +123,7 @@ function subscribe() {
       .then(function(subscription) {
         // The subscription was successful
         isPushEnabled = true;
-        subBtn.textContent = 'Disable Push Messages';
+        subBtn.textContent = 'Unsubscribe from Push Messaging';
         subBtn.disabled = false;
         
         var endpoint = subscription.endpoint;
@@ -143,7 +143,7 @@ function subscribe() {
           // and / or gcm_user_visible_only
           console.log('Unable to subscribe to push.', e);
           subBtn.disabled = false;
-          subBtn.textContent = 'Enable Push Messages';
+          subBtn.textContent = 'Subscribe to Push Messaging';
         }
       });
   });
@@ -159,14 +159,14 @@ function unsubscribe() {
       function(subscription) {
         var endpoint = subscription.endpoint;
         updateStatus(endpoint,'unsubscribe');
-        
+
         // Check we have a subscription to unsubscribe
         if (!subscription) {
           // No subscription object, so set the state
           // to allow the user to subscribe to push
           isPushEnabled = false;
           subBtn.disabled = false;
-          subBtn.textContent = 'Enable Push Messages';
+          subBtn.textContent = 'Subscribe to Push Messaging';
           return;
         }
         
@@ -175,7 +175,7 @@ function unsubscribe() {
         // We have a subcription, so call unsubscribe on it
         subscription.unsubscribe().then(function(successful) {
           subBtn.disabled = false;
-          subBtn.textContent = 'Enable Push Messages';
+          subBtn.textContent = 'Subscribe to Push Messaging';
           isPushEnabled = false;
         }).catch(function(e) {
           // We failed to unsubscribe, this can lead to
